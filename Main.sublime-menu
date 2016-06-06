@@ -1,0 +1,9 @@
+[{
+  "caption": "Tools",
+  "id": "tools",
+  "children": [{
+    "id": "getimportxml",
+    "caption": "GetImportXml",
+    "command": "getimportxml"
+  }]
+}]
