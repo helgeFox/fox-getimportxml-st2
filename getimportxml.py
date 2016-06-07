@@ -11,8 +11,8 @@ class getimportxmlCommand(sublime_plugin.TextCommand):
 
   url = ''
   environments = {
-    'stage': 'http://ws.prod.stage.foxpublish.net/EditorService.asmx?WSDL',
-    'prod': 'http://ws.prod.foxpublish.net/EditorService.asmx?WSDL'
+    'Stage': 'http://ws.prod.stage.foxpublish.net/EditorService.asmx?WSDL',
+    'Prod': 'http://ws.prod.foxpublish.net/EditorService.asmx?WSDL'
     }
   env_options = ['Stage', 'Prod']
   clip = ''
