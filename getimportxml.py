@@ -1,6 +1,11 @@
 import sublime, sublime_plugin, sys, os
 
+import suds
 from suds.client import Client
+
+import logging
+logging.basicConfig()
+# logging.getLogger('suds').setLevel(logging.DEBUG)
 
 class ShowContentsCommand(sublime_plugin.TextCommand):
   def run(self, edit, content):
@@ -25,7 +30,8 @@ class getimportxmlCommand(sublime_plugin.TextCommand):
     self.view.window().show_quick_panel(self.env_options, self.on_env_changed)
 
   def on_env_changed(self, index):
-    self.url = self.environments[self.env_options[index]]
+    self.env = self.env_options[index]
+    self.url = self.environments[self.env]
     self.check_clipboard()
 
   def check_clipboard(self):
@@ -51,16 +57,28 @@ class getimportxmlCommand(sublime_plugin.TextCommand):
   def on_panel_done(self, sessionid):
     if sessionid:
       client = Client(self.url)
-      result = client.service.GetImportXml(sessionid)
       try:
-        self.show_result(result)
+        result = client.service.GetImportXml(sessionid)
+      except suds.WebFault as fault:
+        err = str(fault)
+        err = err[err.find('---> ') + 5:]
+        err = err[:err.find('\n')]
+        result = 'Error calling service.\n\n' + err
       except:
-        sublime.message_dialog('No xml returned from service.')
+        result = 'Unexpected error when calling service.'
+    self.show_result(result)
 
   def show_result(self, content):
     view = sublime.active_window().new_file()
-    view.run_command('show_contents', {"content": content.Xml})
-    view.run_command('fox_cleanup_xml')
+    try:
+      view.run_command('show_contents', {"content": content.Xml})
+      view.run_command('fox_cleanup_xml')
+    except:
+      view.run_command('show_contents', {"content": str(content)})
+      self.show_error('No xml returned from service.\nSure it was a \"{0}\" session id?\nSure it was not expired?'.format(self.env))
+
+  def show_error(self, message):
+    sublime.message_dialog(message)
 
   def on_panel_change(self, abbr):
     if abbr:
