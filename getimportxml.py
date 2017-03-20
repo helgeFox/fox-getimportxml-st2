@@ -1,4 +1,4 @@
-import sublime, sublime_plugin, sys, os
+import sublime, sublime_plugin, sys, os, urllib
 
 import suds
 from suds.client import Client
@@ -58,6 +58,7 @@ class getimportxmlCommand(sublime_plugin.TextCommand):
     if sessionid:
       client = Client(self.url)
       try:
+        sessionid = urllib.unquote(sessionid)
         result = client.service.GetImportXml(sessionid)
       except suds.WebFault as fault:
         err = str(fault)
